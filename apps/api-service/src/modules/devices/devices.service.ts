@@ -16,14 +16,15 @@ export class DevicesService {
       throw new BadRequestException('Controller not found');
     }
 
-    if (controller.roomId !== dto.room_id) {
+    // Only check room_id if it was provided in the DTO
+    if (dto.room_id && controller.roomId !== dto.room_id) {
       throw new BadRequestException('Room mismatch for controller');
     }
 
     const device = await this.prisma.device.upsert({
       where: { id: dto.device_id },
       update: {
-        friendly_name: dto.device_id,
+        friendly_name: dto.friendly_name ?? dto.device_id,
         device_type: dto.device_type,
         device_category: dto.device_category,
         properties: (dto.properties ?? undefined) as any
@@ -33,7 +34,7 @@ export class DevicesService {
         controllerId: controller.id,
         tenantId: controller.tenantId,
         roomId: controller.roomId,
-        friendly_name: dto.device_id,
+        friendly_name: dto.friendly_name ?? dto.device_id,
         device_type: dto.device_type,
         device_category: dto.device_category,
         properties: (dto.properties ?? undefined) as any

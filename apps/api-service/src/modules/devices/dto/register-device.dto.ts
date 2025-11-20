@@ -1,5 +1,5 @@
 import { Type } from 'class-transformer';
-import { IsArray, IsNotEmpty, IsOptional, IsString, MaxLength } from 'class-validator';
+import { IsArray, IsInt, IsNotEmpty, IsOptional, IsString, MaxLength } from 'class-validator';
 
 class DeviceTopicDto {
   @IsString()
@@ -21,10 +21,10 @@ export class RegisterDeviceDto {
   @MaxLength(100)
   controller_id!: string;
 
+  @IsOptional()
   @IsString()
-  @IsNotEmpty()
   @MaxLength(100)
-  room_id!: string;
+  room_id?: string;
 
   @IsString()
   @IsNotEmpty()
@@ -43,4 +43,17 @@ export class RegisterDeviceDto {
   @IsArray()
   @Type(() => DeviceTopicDto)
   mqtt_topics?: DeviceTopicDto[];
+
+  // Additional Teensy metadata fields
+  @IsOptional()
+  @IsInt()
+  device_index?: number;
+
+  @IsOptional()
+  @IsString()
+  friendly_name?: string;
+
+  @IsOptional()
+  @IsString()
+  device_command_name?: string;
 }

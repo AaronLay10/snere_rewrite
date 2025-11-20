@@ -148,4 +148,33 @@ export class RegisterControllerDto {
   @IsObject()
   @Type(() => CapabilityManifestDto)
   capability_manifest?: CapabilityManifestDto;
+
+  // Additional Teensy metadata fields
+  @IsOptional()
+  @IsString()
+  mcu_model?: string;
+
+  @IsOptional()
+  @IsInt()
+  clock_speed_mhz?: number;
+
+  @IsOptional()
+  @IsInt()
+  digital_pins_total?: number;
+
+  @IsOptional()
+  @IsInt()
+  analog_pins_total?: number;
+
+  @IsOptional()
+  @IsString()
+  mqtt_namespace?: string;
+
+  @IsOptional()
+  @IsString()
+  mqtt_room_id?: string;
+
+  @IsOptional()
+  @IsString()
+  mqtt_controller_id?: string;
 }
