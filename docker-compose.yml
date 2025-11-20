@@ -43,11 +43,12 @@ services:
     image: eclipse-mosquitto:2
     container_name: sentient_mqtt
     restart: unless-stopped
-    # For local dev we'll allow anonymous access by using the
-    # default config. You can lock this down later.
     ports:
       - "1883:1883"    # MQTT
       - "9001:9001"    # MQTT over WebSockets (optional)
+    volumes:
+      - ./mosquitto/config:/mosquitto/config
+      - mqttdata:/mosquitto/data
     networks:
       - sentient_net
 
@@ -235,3 +236,4 @@ networks:
 volumes:
   pgdata:
   redisdata:
+  mqttdata:
