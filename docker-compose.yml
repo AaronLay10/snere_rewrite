@@ -106,25 +106,26 @@ services:
   #   networks:
   #     - sentient_net
 
-  # mqtt-gateway-service:
-  #   build:
-  #     context: .
-  #     dockerfile: apps/mqtt-gateway-service/Dockerfile
-  #   container_name: sentient_mqtt_gateway
-  #   restart: unless-stopped
-  #   env_file:
-  #     - .env
-  #   environment:
-  #     NODE_ENV: development
-  #     MQTT_URL: mqtt://mqtt:1883
-  #     REDIS_URL: redis://redis:6379
-  #   depends_on:
-  #     - mqtt
-  #     - redis
-  #   volumes:
-  #     - ./apps/mqtt-gateway-service:/app:cached
-  #   networks:
-  #     - sentient_net
+  mqtt-gateway:
+    build:
+      context: .
+      dockerfile: apps/mqtt-gateway/Dockerfile
+    container_name: sentient_mqtt_gateway
+    restart: unless-stopped
+    env_file:
+      - .env
+    environment:
+      NODE_ENV: production
+      MQTT_URL: mqtt://mqtt:1883
+      API_URL: http://api-service:3000
+      INTERNAL_REG_TOKEN: ${INTERNAL_REG_TOKEN}
+    depends_on:
+      mqtt:
+        condition: service_started
+      api-service:
+        condition: service_healthy
+    networks:
+      - sentient_net
 
   # realtime-gateway-service:
   #   build:
