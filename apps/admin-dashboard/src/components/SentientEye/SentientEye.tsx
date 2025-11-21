@@ -1,6 +1,5 @@
 import { useEffect, useState } from 'react';
 import { Activity, Server, Cpu, HardDrive, Network, Zap } from 'lucide-react';
-import NeuralEyeLogo from '../NeuralEyeLogo';
 import './SentientEye.css';
 
 export interface SystemHealth {
@@ -34,9 +33,13 @@ interface SentientEyeProps {
 
 export function SentientEye({ health, onIssueClick }: SentientEyeProps) {
   const [currentTime, setCurrentTime] = useState(new Date());
-  const [cpuUsage] = useState(Math.floor(Math.random() * 30 + 15));
-  const [memUsage] = useState(Math.floor(Math.random() * 40 + 30));
-  const [networkLoad] = useState(Math.floor(Math.random() * 20 + 5));
+  const [cpuUsage] = useState(() => Math.floor(Math.random() * 30 + 15));
+  const [memUsage] = useState(() => Math.floor(Math.random() * 40 + 30));
+  const [networkLoad] = useState(() => Math.floor(Math.random() * 20 + 5));
+  const [devOverrideHealth, setDevOverrideHealth] = useState<SystemHealth['overall'] | null>(null);
+
+  // Use dev override if set, otherwise use actual health
+  const effectiveHealth = devOverrideHealth || health.overall;
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -75,11 +78,84 @@ export function SentientEye({ health, onIssueClick }: SentientEyeProps) {
     }
   };
 
-  const uptime = Math.floor(Math.random() * 72 + 1);
-  const healthColor = getHealthColor(health.overall);
+  const [uptime] = useState(() => Math.floor(Math.random() * 72 + 1));
+  const healthColor = getHealthColor(effectiveHealth);
 
   return (
     <div className="hud-container">
+      {/* Developer Controls */}
+      <div style={{
+        position: 'absolute',
+        top: '10px',
+        right: '10px',
+        zIndex: 9999,
+        background: 'rgba(10, 14, 20, 0.95)',
+        border: '1px solid rgba(0, 217, 255, 0.3)',
+        borderRadius: '4px',
+        padding: '12px',
+        display: 'flex',
+        gap: '8px',
+        alignItems: 'center'
+      }}>
+        <span style={{ fontSize: '0.7rem', color: 'var(--text-muted)', marginRight: '8px' }}>DEV CONTROLS:</span>
+        <button
+          onClick={() => setDevOverrideHealth(null)}
+          style={{
+            padding: '6px 12px',
+            fontSize: '0.7rem',
+            background: devOverrideHealth === null ? 'rgba(0, 217, 255, 0.2)' : 'rgba(0, 217, 255, 0.05)',
+            border: '1px solid rgba(0, 217, 255, 0.3)',
+            color: 'var(--accent-primary)',
+            cursor: 'pointer',
+            borderRadius: '2px'
+          }}
+        >
+          ACTUAL
+        </button>
+        <button
+          onClick={() => setDevOverrideHealth('healthy')}
+          style={{
+            padding: '6px 12px',
+            fontSize: '0.7rem',
+            background: devOverrideHealth === 'healthy' ? 'rgba(0, 217, 255, 0.2)' : 'rgba(0, 217, 255, 0.05)',
+            border: '1px solid var(--status-healthy)',
+            color: 'var(--status-healthy)',
+            cursor: 'pointer',
+            borderRadius: '2px'
+          }}
+        >
+          HEALTHY
+        </button>
+        <button
+          onClick={() => setDevOverrideHealth('warning')}
+          style={{
+            padding: '6px 12px',
+            fontSize: '0.7rem',
+            background: devOverrideHealth === 'warning' ? 'rgba(255, 170, 0, 0.2)' : 'rgba(255, 170, 0, 0.05)',
+            border: '1px solid var(--status-warning)',
+            color: 'var(--status-warning)',
+            cursor: 'pointer',
+            borderRadius: '2px'
+          }}
+        >
+          WARNING
+        </button>
+        <button
+          onClick={() => setDevOverrideHealth('critical')}
+          style={{
+            padding: '6px 12px',
+            fontSize: '0.7rem',
+            background: devOverrideHealth === 'critical' ? 'rgba(255, 51, 85, 0.2)' : 'rgba(255, 51, 85, 0.05)',
+            border: '1px solid var(--status-critical)',
+            color: 'var(--status-critical)',
+            cursor: 'pointer',
+            borderRadius: '2px'
+          }}
+        >
+          CRITICAL
+        </button>
+      </div>
+
       {/* Header Bar */}
       <div className="hud-header">
         <div className="hud-header-left">
@@ -105,7 +181,7 @@ export function SentientEye({ health, onIssueClick }: SentientEyeProps) {
             <div className="metric-row">
               <span className="metric-label">STATUS</span>
               <span className="metric-value" style={{ color: healthColor }}>
-                {getStatusText(health.overall)}
+                {getStatusText(effectiveHealth)}
               </span>
             </div>
             <div className="metric-row">
@@ -253,26 +329,38 @@ export function SentientEye({ health, onIssueClick }: SentientEyeProps) {
                 transform="translate(2, 2)"
               />
 
-              {/* Rotating ring with alternating cyan and orange segments - 8 total segments touching */}
-              <g className="rotating-outer-ring" style={{ filter: 'url(#outerGlow)' }}>
-                {/* Cyan segments - positions 0, 2, 4, 6 (every other segment) */}
+              {/* Rotating ring with alternating segments - colors and speed change based on health status */}
+              <g className={`rotating-outer-ring ${effectiveHealth === 'warning' ? 'status-warning' : effectiveHealth === 'critical' ? 'status-critical' : ''}`} style={{ filter: 'url(#outerGlow)' }}>
+                {/* Primary segments - cyan (healthy), orange (warning), or red (critical) */}
                 <circle
                   cx="180"
                   cy="180"
                   r="150"
                   fill="none"
-                  stroke="rgba(0, 217, 255, 1.0)"
+                  stroke={
+                    effectiveHealth === 'critical'
+                      ? 'rgba(255, 51, 85, 1.0)'
+                      : effectiveHealth === 'warning'
+                      ? 'rgba(255, 170, 0, 1.0)'
+                      : 'rgba(0, 217, 255, 1.0)'
+                  }
                   strokeWidth="6"
                   strokeDasharray="117.75 117.75"
                   strokeDashoffset="0"
                 />
-                {/* Orange segments - positions 1, 3, 5, 7 (offset to fill gaps) */}
+                {/* Secondary segments - orange (healthy), yellow (warning), or dark red (critical) */}
                 <circle
                   cx="180"
                   cy="180"
                   r="150"
                   fill="none"
-                  stroke="rgba(255, 170, 50, 1.0)"
+                  stroke={
+                    effectiveHealth === 'critical'
+                      ? 'rgba(200, 30, 60, 1.0)'
+                      : effectiveHealth === 'warning'
+                      ? 'rgba(255, 200, 0, 1.0)'
+                      : 'rgba(255, 170, 50, 1.0)'
+                  }
                   strokeWidth="6"
                   strokeDasharray="117.75 117.75"
                   strokeDashoffset="-117.75"
@@ -415,10 +503,10 @@ export function SentientEye({ health, onIssueClick }: SentientEyeProps) {
                 </svg>
 
                 {/* Digital colored iris with circuit-like texture */}
-                <div className="eye-iris" style={{
-                  background: health.overall === 'critical'
+                <div className={`eye-iris ${effectiveHealth === 'warning' ? 'status-warning' : effectiveHealth === 'critical' ? 'status-critical' : ''}`} style={{
+                  background: effectiveHealth === 'critical'
                     ? 'conic-gradient(from 0deg, #00d9ff 0deg, #ff9933 60deg, #00d9ff 120deg, #ff6644 180deg, #00aacc 240deg, #ffaa44 300deg, #00d9ff 360deg), radial-gradient(circle at 35% 35%, #88ddff 0%, #0099cc 50%, #003344 100%)'
-                    : health.overall === 'warning'
+                    : effectiveHealth === 'warning'
                     ? 'conic-gradient(from 0deg, #00d9ff 0deg, #ffaa33 60deg, #00d9ff 120deg, #ff8844 180deg, #00aacc 240deg, #ffcc44 300deg, #00d9ff 360deg), radial-gradient(circle at 35% 35%, #88ddff 0%, #0099cc 50%, #003344 100%)'
                     : 'conic-gradient(from 0deg, #00d9ff 0deg, #ffaa33 60deg, #00d9ff 120deg, #ff8844 180deg, #00aacc 240deg, #ffcc44 300deg, #00d9ff 360deg), radial-gradient(circle at 35% 35%, #88ddff 0%, #0099cc 50%, #003344 100%)'
                 }}>

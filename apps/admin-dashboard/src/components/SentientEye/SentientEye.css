@@ -233,7 +233,31 @@
     0 5px 25px rgba(0, 217, 255, 0.3),
     0 0 15px rgba(255, 170, 50, 0.2);
   overflow: hidden;
-  animation: iris-analyzing 20s ease-in-out infinite;
+  animation: iris-analyzing 30s ease-in-out infinite;
+}
+
+/* Warning status styling */
+.eye-iris.status-warning {
+  box-shadow:
+    inset 0 -8px 20px rgba(0, 0, 0, 0.7),
+    inset 0 8px 15px rgba(255, 255, 255, 0.05),
+    inset -5px 0 15px rgba(0, 0, 0, 0.4),
+    inset 5px 0 10px rgba(255, 255, 255, 0.03),
+    0 5px 30px rgba(255, 170, 0, 0.6),
+    0 0 20px rgba(255, 170, 0, 0.4);
+  animation: iris-warning 20s ease-in-out infinite;
+}
+
+/* Critical status styling (red alert) */
+.eye-iris.status-critical {
+  box-shadow:
+    inset 0 -8px 20px rgba(0, 0, 0, 0.7),
+    inset 0 8px 15px rgba(255, 255, 255, 0.05),
+    inset -5px 0 15px rgba(0, 0, 0, 0.4),
+    inset 5px 0 10px rgba(255, 255, 255, 0.03),
+    0 5px 35px rgba(255, 51, 85, 0.8),
+    0 0 25px rgba(255, 51, 85, 0.6);
+  animation: iris-critical 10s linear infinite;
 }
 
 .iris-circuits {
@@ -466,6 +490,218 @@
   }
 }
 
+/* Warning status - faster, more urgent scanning */
+@keyframes iris-warning {
+  0%, 5% {
+    transform: translate(-50%, -50%);
+  }
+  6%, 8% {
+    transform: translate(-80%, -75%);
+  }
+  9%, 13% {
+    transform: translate(-20%, -70%);
+  }
+  14%, 16% {
+    transform: translate(-75%, -25%);
+  }
+  17%, 21% {
+    transform: translate(-28%, -78%);
+  }
+  22%, 24% {
+    transform: translate(-78%, -32%);
+  }
+  25%, 29% {
+    transform: translate(-22%, -76%);
+  }
+  30%, 32% {
+    transform: translate(-76%, -70%);
+  }
+  33%, 37% {
+    transform: translate(-32%, -28%);
+  }
+  38%, 40% {
+    transform: translate(-70%, -78%);
+  }
+  41%, 45% {
+    transform: translate(-30%, -72%);
+  }
+  46%, 48% {
+    transform: translate(-74%, -30%);
+  }
+  49%, 53% {
+    transform: translate(-26%, -74%);
+  }
+  54%, 56% {
+    transform: translate(-80%, -26%);
+  }
+  57%, 61% {
+    transform: translate(-24%, -80%);
+  }
+  62%, 64% {
+    transform: translate(-72%, -24%);
+  }
+  65%, 100% {
+    transform: translate(-50%, -50%);
+  }
+}
+
+/* Critical status - rapid, erratic scanning (red alert) */
+@keyframes iris-critical {
+  0%, 1% {
+    transform: translate(-50%, -50%);
+  }
+  2%, 3% {
+    transform: translate(-75%, -30%);
+  }
+  4%, 5% {
+    transform: translate(-25%, -75%);
+  }
+  6%, 7% {
+    transform: translate(-80%, -65%);
+  }
+  8%, 9% {
+    transform: translate(-35%, -22%);
+  }
+  10%, 11% {
+    transform: translate(-68%, -82%);
+  }
+  12%, 13% {
+    transform: translate(-20%, -45%);
+  }
+  14%, 15% {
+    transform: translate(-82%, -28%);
+  }
+  16%, 17% {
+    transform: translate(-42%, -70%);
+  }
+  18%, 19% {
+    transform: translate(-65%, -35%);
+  }
+  20%, 21% {
+    transform: translate(-28%, -80%);
+  }
+  22%, 23% {
+    transform: translate(-78%, -50%);
+  }
+  24%, 25% {
+    transform: translate(-32%, -25%);
+  }
+  26%, 27% {
+    transform: translate(-70%, -72%);
+  }
+  28%, 29% {
+    transform: translate(-22%, -60%);
+  }
+  30%, 31% {
+    transform: translate(-80%, -38%);
+  }
+  32%, 33% {
+    transform: translate(-45%, -78%);
+  }
+  34%, 35% {
+    transform: translate(-62%, -24%);
+  }
+  36%, 37% {
+    transform: translate(-30%, -68%);
+  }
+  38%, 39% {
+    transform: translate(-75%, -55%);
+  }
+  40%, 41% {
+    transform: translate(-38%, -32%);
+  }
+  42%, 43% {
+    transform: translate(-72%, -75%);
+  }
+  44%, 45% {
+    transform: translate(-25%, -42%);
+  }
+  46%, 47% {
+    transform: translate(-82%, -70%);
+  }
+  48%, 49% {
+    transform: translate(-48%, -28%);
+  }
+  50%, 51% {
+    transform: translate(-68%, -62%);
+  }
+  52%, 53% {
+    transform: translate(-22%, -72%);
+  }
+  54%, 55% {
+    transform: translate(-78%, -35%);
+  }
+  56%, 57% {
+    transform: translate(-35%, -80%);
+  }
+  58%, 59% {
+    transform: translate(-70%, -25%);
+  }
+  60%, 61% {
+    transform: translate(-28%, -65%);
+  }
+  62%, 63% {
+    transform: translate(-82%, -52%);
+  }
+  64%, 65% {
+    transform: translate(-40%, -38%);
+  }
+  66%, 67% {
+    transform: translate(-65%, -78%);
+  }
+  68%, 69% {
+    transform: translate(-24%, -48%);
+  }
+  70%, 71% {
+    transform: translate(-75%, -68%);
+  }
+  72%, 73% {
+    transform: translate(-32%, -58%);
+  }
+  74%, 75% {
+    transform: translate(-80%, -42%);
+  }
+  76%, 77% {
+    transform: translate(-52%, -75%);
+  }
+  78%, 79% {
+    transform: translate(-68%, -30%);
+  }
+  80%, 81% {
+    transform: translate(-22%, -80%);
+  }
+  82%, 83% {
+    transform: translate(-78%, -60%);
+  }
+  84%, 85% {
+    transform: translate(-38%, -25%);
+  }
+  86%, 87% {
+    transform: translate(-72%, -70%);
+  }
+  88%, 89% {
+    transform: translate(-28%, -55%);
+  }
+  90%, 91% {
+    transform: translate(-82%, -75%);
+  }
+  92%, 93% {
+    transform: translate(-45%, -35%);
+  }
+  94%, 95% {
+    transform: translate(-65%, -82%);
+  }
+  96%, 97% {
+    transform: translate(-30%, -72%);
+  }
+  98%, 99% {
+    transform: translate(-75%, -45%);
+  }
+  100% {
+    transform: translate(-50%, -50%);
+  }
+}
+
 @keyframes pupil-dilate {
   0%, 100% {
     transform: translate(-50%, -50%) scale(1);
@@ -510,124 +746,18 @@
 }
 
 .rotating-outer-ring {
-  animation: rotate 6s linear infinite;
+  animation: rotate 9s linear infinite;
   transform-origin: center;
 }
 
-/* The Watchful Eye */
-.neural-eye {
-  position: absolute;
-  width: 140px;
-  height: 140px;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  filter: drop-shadow(0 0 20px rgba(0, 217, 255, 0.3));
+/* Faster rotation for warning status */
+.rotating-outer-ring.status-warning {
+  animation: rotate 6s linear infinite;
 }
 
-/* Neural Connection Beams */
-.neural-network {
-  position: absolute;
-  width: 100%;
-  height: 100%;
-  top: 0;
-  left: 0;
-  z-index: 2;
-}
-
-.neural-beam {
-  opacity: 0;
-  animation: pulse-beam 8s infinite;
-}
-
-@keyframes pulse-beam {
-  0% {
-    opacity: 0;
-  }
-  20% {
-    opacity: 1;
-  }
-  80% {
-    opacity: 1;
-  }
-  100% {
-    opacity: 0;
-  }
-}
-
-/* Rotating Iris Ring */
-.neural-iris {
-  width: 120px;
-  height: 120px;
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  border-radius: 50%;
-  padding: 3px;
-  animation: rotate-iris 7s ease-in-out infinite;
-  filter: brightness(1.2);
-}
-
-.neural-iris-inner {
-  position: absolute;
-  width: calc(100% - 6px);
-  height: calc(100% - 6px);
-  top: 3px;
-  left: 3px;
-  border-radius: 50%;
-  background: var(--bg-primary);
-  z-index: 1;
-}
-
-@keyframes rotate-iris {
-  from {
-    transform: translate(-50%, -50%) rotate(0deg);
-  }
-  to {
-    transform: translate(-50%, -50%) rotate(360deg);
-  }
-}
-
-/* Glowing Eyeball */
-.neural-eyeball {
-  width: 50px;
-  height: 50px;
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  border-radius: 50%;
-  z-index: 3;
-  animation: neural-pulse 2s ease-in-out infinite;
-  filter: drop-shadow(0 0 10px currentColor);
-}
-
-@keyframes neural-pulse {
-  0% {
-    transform: translate(-50%, -50%) scale(1);
-    filter: brightness(1);
-  }
-  25% {
-    transform: translate(-50%, -50%) scale(1.03);
-    filter: brightness(1.15);
-  }
-  50% {
-    transform: translate(-50%, -50%) scale(1.06);
-    filter: brightness(1.25);
-  }
-  65% {
-    transform: translate(-50%, -50%) scale(1.04);
-    filter: brightness(1.2);
-  }
-  80% {
-    transform: translate(-50%, -50%) scale(1.02);
-    filter: brightness(1.1);
-  }
-  100% {
-    transform: translate(-50%, -50%) scale(1);
-    filter: brightness(1);
-  }
+/* Fastest rotation for critical status */
+.rotating-outer-ring.status-critical {
+  animation: rotate 3s linear infinite;
 }
 
 /* The Watchful Pupil */
