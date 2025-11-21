@@ -231,27 +231,51 @@ export function SentientEye({ health, onIssueClick }: SentientEyeProps) {
 
             {/* Rotating ring around eye - renders BEFORE eye so it appears behind */}
             <svg viewBox="0 0 360 360" style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', width: '360px', height: '360px', pointerEvents: 'none', overflow: 'visible' }}>
-              {/* Static cyan ring - BRIGHT, not rotating */}
+              <defs>
+                {/* Outer glow filter for the rotating ring */}
+                <filter id="outerGlow">
+                  <feGaussianBlur stdDeviation="8" result="coloredBlur"/>
+                  <feMerge>
+                    <feMergeNode in="coloredBlur"/>
+                    <feMergeNode in="SourceGraphic"/>
+                  </feMerge>
+                </filter>
+              </defs>
+
+              {/* 3D shadow/depth layer behind rings */}
               <circle
                 cx="180"
                 cy="180"
                 r="150"
                 fill="none"
-                stroke="rgba(0, 217, 255, 1.0)"
-                strokeWidth="4"
+                stroke="rgba(0, 0, 0, 0.6)"
+                strokeWidth="6"
+                transform="translate(2, 2)"
               />
 
-              {/* Rotating orange ring on top - BRIGHT - creates swirling effect */}
-              <g className="rotating-outer-ring">
+              {/* Rotating ring with alternating cyan and orange segments - 8 total segments touching */}
+              <g className="rotating-outer-ring" style={{ filter: 'url(#outerGlow)' }}>
+                {/* Cyan segments - positions 0, 2, 4, 6 (every other segment) */}
+                <circle
+                  cx="180"
+                  cy="180"
+                  r="150"
+                  fill="none"
+                  stroke="rgba(0, 217, 255, 1.0)"
+                  strokeWidth="6"
+                  strokeDasharray="117.75 117.75"
+                  strokeDashoffset="0"
+                />
+                {/* Orange segments - positions 1, 3, 5, 7 (offset to fill gaps) */}
                 <circle
                   cx="180"
                   cy="180"
                   r="150"
                   fill="none"
                   stroke="rgba(255, 170, 50, 1.0)"
-                  strokeWidth="4"
-                  opacity="1.0"
-                  strokeDasharray="96 192"
+                  strokeWidth="6"
+                  strokeDasharray="117.75 117.75"
+                  strokeDashoffset="-117.75"
                 />
               </g>
             </svg>
