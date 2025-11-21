@@ -86,19 +86,16 @@ flowchart LR
         GM[Game Master]
         Tech[Technician]
         Admin[Admin / Owner]
-        Players[(Players in Room)]
     end
 
     subgraph UI[UI Layer]
-        GMUI[GM Console (Sentient Web)]
-        AdminUI[Admin / Config UI]
-        RoomUI[Room Display UI]
+        SentientUI[Sentient UI\n(Admin Dashboard)]
     end
 
     subgraph Edge[Hardware Layer]
         Controller[Controllers\n(Teensy / Pi / ESP32 / PCs)]
         Devices[Devices\n(relays, sensors, locks, lights, motors)]
-        AV[Audio / Lighting / FX]
+        Displays[In-Room Displays\n(via Controllers)]
     end
 
     subgraph Broker[Messaging Layer]
@@ -118,14 +115,10 @@ flowchart LR
         REDIS[(Redis Cache / PubSub)]
     end
 
-    Users --> GMUI
-    Users --> AdminUI
-    Players --> RoomUI
+    Users --> SentientUI
 
-    GMUI <-->|HTTP / WS| API
-    GMUI <-->|WS| RTGW
-    AdminUI <-->|HTTP| API
-    RoomUI <-->|WS| RTGW
+    SentientUI <-->|HTTP / WS| API
+    SentientUI <-->|WS| RTGW
 
     API <-->|SQL| PG
     ORCH <-->|SQL| PG
@@ -136,9 +129,9 @@ flowchart LR
     MQTTGW <-->|Pub/Sub| REDIS
 
     Controller <--> Devices
+    Controller <--> Displays
     Controller <--> MQTT
     MQTTGW <--> MQTT
-    AV <--> Controller
 ```
 
 ---
@@ -278,7 +271,7 @@ All core services are **TypeScript/Node.js** applications, containerized with Do
 
 ---
 
-### 5.3 MQTT Gateway Service (`apps/mqtt-gateway-service`)
+### 5.3 MQTT Gateway Service (`apps/mqtt-gateway`)
 
 **Role:** Translation layer between controller/device topics and domain events/commands.
 
@@ -322,20 +315,19 @@ Example payload:
 
 ---
 
-### 5.4 Realtime Gateway Service (`apps/realtime-gateway-service`)
+### 5.4 Realtime Gateway Service (`apps/realtime-gateway`)
 
 **Role:** WebSocket hub for all Sentient UIs.
 
 **Responsibilities:**
 
 - Accept WebSocket connections from:
-  - GM UI
-  - Admin UI
-  - Room Display UIs
-- Authenticate clients using JWT on connection  
-- Join clients to per-room / per-tenant channels  
-  - e.g., `gm:room:<room_id>`, `display:room:<room_id>`
-- Listen for domain events via Redis pub/sub and fan-out to connected sockets  
+  - Sentient UI (admin-dashboard)
+  - Any authorized clients
+- Authenticate clients using JWT on connection
+- Join clients to per-room / per-tenant channels
+  - e.g., `room:<room_id>`, `tenant:<tenant_id>`
+- Listen for domain events via Redis pub/sub and fan-out to connected sockets
 - Accept control commands from UIs (skip puzzle, trigger hint, force open lock) and forward them to Orchestrator/API  
 
 **Tech:**
@@ -368,14 +360,26 @@ Example payload:
 
 ---
 
-### 5.6 Web Frontends (Sentient Web)
+### 5.6 Web Frontend (Sentient UI)
 
-#### 5.6.1 GM UI (`apps/gm-ui`)
+#### 5.6.1 Sentient UI (`apps/admin-dashboard`)
 
-**Role:** Live game master console.
+**Role:** Unified web interface for configuration, management, and live game master operations.
 
-Features:
+**Also known as:** Admin UI, Sentient Web
 
+**Features:**
+
+**Configuration & Management:**
+- Tenant & venue management
+- Room configuration:
+  - Controllers and devices
+  - Scene graphs and puzzle definitions
+  - Puzzle → device mappings
+- User/role management
+- Future: pricing/scheduling hooks
+
+**Live Game Master Operations:**
 - Multi-room overview dashboard:
   - Timers
   - Puzzle/scene states
@@ -383,45 +387,17 @@ Features:
 - Per-room detailed control view:
   - Puzzles, scenes, hints, script notes
   - Manual overrides (skip puzzles, force open, reset devices)
-- Visual event timeline  
+- Visual event timeline
 
-Tech:
+**Tech:**
 
-- React + Next.js (TypeScript)  
-- Tailwind CSS + component library (e.g., shadcn/ui)  
+- React + Vite (TypeScript)
+- Tailwind CSS + component library
 - Communication:
-  - REST (API Service) for config and history  
-  - WebSockets (Realtime Gateway) for live updates  
+  - REST (API Service) for config and history
+  - WebSockets (Realtime Gateway) for live updates
 
-#### 5.6.2 Admin UI (`apps/admin-ui`)
-
-**Role:** Tenant/venue configuration and management.
-
-Features:
-
-- Tenant & venue management  
-- Room configuration:
-  - Controllers and devices
-  - Scene graphs and puzzle definitions
-  - Puzzle → device mappings
-- User/role management  
-- Future: pricing/scheduling hooks  
-
-Tech: Same stack as GM UI (Next.js, TS, Tailwind).
-
-#### 5.6.3 Room Display UI (`apps/room-ui`)
-
-**Role:** In-room player display.
-
-- Runs on Raspberry Pi in kiosk-mode Chromium.  
-- Loads URL like:  
-  `https://rooms.sentientengine.local/room/<room_id>`  
-- Displays:
-  - Countdown timers
-  - Story text
-  - Hint overlays
-  - Video/animation playback  
-- Receives commands via WebSockets from Realtime Gateway.
+**Note:** In-room player displays (countdown timers, story text, etc.) are handled by controller-based display systems, not web UIs.
 
 ---
 
@@ -525,9 +501,9 @@ Redis is used for:
 
 - Caching frequently-used configurations (room layouts, controller/device maps)  
 - Pub/sub channels for:
-  - Events from MQTT Gateway → Orchestrator  
-  - Domain events from Orchestrator → Realtime Gateway  
-  - Commands from GM UI → Orchestrator  
+  - Events from MQTT Gateway → Orchestrator
+  - Domain events from Orchestrator → Realtime Gateway
+  - Commands from Sentient UI → Orchestrator  
 
 ---
 
@@ -607,16 +583,16 @@ Primary target:
 
 **Docker Compose stack includes:**
 
-- `sentient-postgres`  
-- `sentient-redis`  
-- `sentient-mosquitto`  
-- `api-service`  
-- `orchestrator-service`  
-- `mqtt-gateway-service`  
-- `realtime-gateway-service`  
-- `jobs-service`  
-- `gm-ui`, `admin-ui`, `room-ui`  
-- Observability:
+- `sentient-postgres`
+- `sentient-redis`
+- `sentient-mosquitto`
+- `api-service`
+- `orchestrator-service`
+- `mqtt-gateway`
+- `realtime-gateway`
+- `jobs-service` (future)
+- `admin-dashboard` (Sentient UI - typically run separately in dev)
+- Observability (future):
   - `prometheus`, `grafana`
   - `loki`, `promtail` (or similar)
 
@@ -699,16 +675,14 @@ Sentient Engine uses a **TypeScript monorepo**.
 ### 12.1 Top-Level Layout
 
 ```text
-snere/                         # repo root
+Sentient/                      # repo root
   apps/
     api-service/
     orchestrator-service/
-    mqtt-gateway-service/
-    realtime-gateway-service/
-    jobs-service/
-    gm-ui/
-    admin-ui/
-    room-ui/
+    mqtt-gateway/
+    realtime-gateway/
+    jobs-service/              # (future)
+    admin-dashboard/           # Sentient UI
     device-simulators/
   packages/
     core-domain/

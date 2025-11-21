@@ -7,6 +7,7 @@ import { Devices } from './pages/Devices';
 import { Rooms } from './pages/Rooms';
 import { Tenants } from './pages/Tenants';
 import { Users } from './pages/Users';
+import { GMConsole } from './pages/GMConsole';
 import './styles/globals.css';
 
 const queryClient = new QueryClient({
@@ -26,6 +27,7 @@ function App() {
           <Route path="/" element={<DashboardLayout />}>
             <Route index element={<Navigate to="/overview" replace />} />
             <Route path="overview" element={<SystemOverview />} />
+            <Route path="gm-console" element={<GMConsole />} />
             <Route path="controllers" element={<Controllers />} />
             <Route path="devices" element={<Devices />} />
             <Route path="rooms" element={<Rooms />} />
