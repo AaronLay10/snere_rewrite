@@ -10,7 +10,7 @@ COPY packages ./packages
 COPY apps/api-service/prisma ./apps/api-service/prisma
 COPY apps/orchestrator-service ./apps/orchestrator-service
 RUN pnpm install --frozen-lockfile
-RUN cd apps/orchestrator-service && pnpm prisma:generate
+RUN pnpm --filter orchestrator-service prisma:generate
 RUN pnpm -r --filter "@sentient/*" build
 RUN pnpm -r --filter orchestrator-service build
 
@@ -26,5 +26,5 @@ COPY --from=build /app/apps/api-service/prisma ./apps/api-service/prisma
 COPY --from=build /app/apps/orchestrator-service/dist ./apps/orchestrator-service/dist
 COPY --from=build /app/apps/orchestrator-service/package.json ./apps/orchestrator-service/
 RUN pnpm install --prod --frozen-lockfile
-RUN cd apps/orchestrator-service && pnpm prisma:generate
+RUN pnpm --filter orchestrator-service prisma:generate
 CMD ["node", "apps/orchestrator-service/dist/main.js"]
