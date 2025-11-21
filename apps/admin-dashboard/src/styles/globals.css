@@ -284,3 +284,348 @@ input:focus, textarea:focus, select:focus {
   pointer-events: none;
   z-index: 0;
 }
+
+/* Tron-style scan line effect */
+.scan-line {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 2px;
+  background: linear-gradient(90deg,
+    transparent 0%,
+    var(--accent-cyan) 50%,
+    transparent 100%);
+  opacity: 0.3;
+  animation: scan var(--scan-duration) linear infinite;
+  pointer-events: none;
+  z-index: 1000;
+  box-shadow: 0 0 10px var(--accent-cyan), 0 0 20px var(--accent-cyan);
+}
+
+/* Hexagonal panels */
+.hex-panel {
+  position: relative;
+  background: rgba(15, 23, 42, 0.8);
+  backdrop-filter: blur(10px);
+  border: 2px solid var(--border-color);
+  clip-path: polygon(
+    30% 0%, 70% 0%,
+    100% 30%, 100% 70%,
+    70% 100%, 30% 100%,
+    0% 70%, 0% 30%
+  );
+  transition: all 0.3s ease;
+}
+
+.hex-panel:hover {
+  border-color: var(--accent-cyan);
+  box-shadow:
+    inset 0 0 20px rgba(0, 217, 255, 0.1),
+    0 0 30px rgba(0, 217, 255, 0.3);
+}
+
+/* Glowing borders for cards */
+.glow-border {
+  position: relative;
+  border: 1px solid transparent;
+  background: linear-gradient(var(--bg-card), var(--bg-card)) padding-box,
+              linear-gradient(135deg, var(--accent-cyan), var(--accent-orange), var(--accent-cyan)) border-box;
+  border-radius: 8px;
+}
+
+.glow-border::before {
+  content: '';
+  position: absolute;
+  inset: -2px;
+  border-radius: 8px;
+  padding: 2px;
+  background: linear-gradient(135deg, var(--accent-cyan), var(--accent-orange));
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.glow-border:hover::before {
+  opacity: 0.6;
+  animation: glow-pulse 2s ease-in-out infinite;
+}
+
+/* Circuit pattern background */
+.circuit-bg {
+  background-image:
+    radial-gradient(circle at 20% 50%, rgba(0, 217, 255, 0.03) 0%, transparent 50%),
+    radial-gradient(circle at 80% 80%, rgba(255, 170, 50, 0.03) 0%, transparent 50%),
+    radial-gradient(circle at 40% 20%, rgba(0, 217, 255, 0.02) 0%, transparent 50%);
+  background-size: 100% 100%;
+}
+
+/* Futuristic corner brackets */
+.corner-brackets {
+  position: relative;
+}
+
+.corner-brackets::before,
+.corner-brackets::after {
+  content: '';
+  position: absolute;
+  width: 20px;
+  height: 20px;
+  border: 2px solid var(--accent-cyan);
+}
+
+.corner-brackets::before {
+  top: -2px;
+  left: -2px;
+  border-right: none;
+  border-bottom: none;
+}
+
+.corner-brackets::after {
+  bottom: -2px;
+  right: -2px;
+  border-left: none;
+  border-top: none;
+}
+
+/* Animated text glow */
+.text-glow {
+  text-shadow:
+    0 0 10px var(--accent-cyan),
+    0 0 20px var(--accent-cyan),
+    0 0 30px var(--accent-cyan);
+  animation: glow-pulse 2s ease-in-out infinite;
+}
+
+/* Energy bar effect */
+.energy-bar {
+  position: relative;
+  height: 4px;
+  background: rgba(0, 217, 255, 0.1);
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+.energy-bar::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg,
+    transparent 0%,
+    var(--accent-cyan) 50%,
+    transparent 100%);
+  animation: energy-flow 2s linear infinite;
+}
+
+@keyframes energy-flow {
+  0% {
+    left: -100%;
+  }
+  100% {
+    left: 100%;
+  }
+}
+
+/* Tron HUD Panel */
+.tron-panel {
+  position: relative;
+  background: linear-gradient(135deg, rgba(15, 23, 42, 0.9), rgba(10, 14, 26, 0.95));
+  border: 2px solid var(--accent-cyan);
+  box-shadow:
+    inset 0 0 20px rgba(0, 217, 255, 0.1),
+    0 0 30px rgba(0, 217, 255, 0.4),
+    0 0 60px rgba(0, 217, 255, 0.2);
+  clip-path: polygon(
+    0 8px, 8px 0,
+    calc(100% - 8px) 0, 100% 8px,
+    100% calc(100% - 8px), calc(100% - 8px) 100%,
+    8px 100%, 0 calc(100% - 8px)
+  );
+}
+
+.tron-panel::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: repeating-linear-gradient(
+    0deg,
+    transparent,
+    transparent 2px,
+    rgba(0, 217, 255, 0.03) 2px,
+    rgba(0, 217, 255, 0.03) 4px
+  );
+  pointer-events: none;
+}
+
+.tron-panel::after {
+  content: '';
+  position: absolute;
+  inset: -2px;
+  background: linear-gradient(135deg, var(--accent-cyan), var(--accent-orange), var(--accent-cyan));
+  opacity: 0.3;
+  filter: blur(10px);
+  z-index: -1;
+  animation: glow-pulse 3s ease-in-out infinite;
+}
+
+/* Scan line effect for panels */
+.panel-scanline {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  pointer-events: none;
+  opacity: 0.4;
+}
+
+.panel-scanline::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: 0;
+  width: 100%;
+  height: 2px;
+  background: linear-gradient(90deg,
+    transparent 0%,
+    var(--accent-cyan) 50%,
+    transparent 100%);
+  box-shadow: 0 0 10px var(--accent-cyan), 0 0 20px var(--accent-cyan);
+  animation: vertical-scan 4s linear infinite;
+}
+
+@keyframes vertical-scan {
+  0% {
+    top: -50%;
+  }
+  100% {
+    top: 150%;
+  }
+}
+
+/* Glowing divider lines */
+.glow-divider {
+  height: 2px;
+  background: linear-gradient(90deg,
+    transparent 0%,
+    var(--accent-cyan) 20%,
+    var(--accent-cyan) 80%,
+    transparent 100%);
+  box-shadow: 0 0 10px var(--accent-cyan), 0 0 20px var(--accent-cyan);
+  position: relative;
+}
+
+.glow-divider::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 30%;
+  height: 100%;
+  background: linear-gradient(90deg,
+    var(--accent-cyan) 0%,
+    transparent 100%);
+  animation: divider-pulse 2s ease-in-out infinite;
+}
+
+@keyframes divider-pulse {
+  0%, 100% {
+    left: 0;
+    opacity: 1;
+  }
+  50% {
+    left: 70%;
+    opacity: 0.3;
+  }
+}
+
+/* Circuit lines connecting elements */
+.circuit-lines {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.circuit-lines::before,
+.circuit-lines::after {
+  content: '';
+  position: absolute;
+  background: var(--accent-cyan);
+  box-shadow: 0 0 10px var(--accent-cyan);
+}
+
+.circuit-lines::before {
+  width: 2px;
+  height: 0;
+  top: 0;
+  right: 20%;
+  animation: circuit-vertical 3s ease-in-out infinite;
+}
+
+.circuit-lines::after {
+  width: 0;
+  height: 2px;
+  bottom: 20%;
+  left: 0;
+  animation: circuit-horizontal 3s ease-in-out infinite 1.5s;
+}
+
+@keyframes circuit-vertical {
+  0%, 100% {
+    height: 0;
+    opacity: 0;
+  }
+  10% {
+    opacity: 1;
+  }
+  50% {
+    height: 100%;
+    opacity: 1;
+  }
+  60% {
+    opacity: 0;
+  }
+}
+
+@keyframes circuit-horizontal {
+  0%, 100% {
+    width: 0;
+    opacity: 0;
+  }
+  10% {
+    opacity: 1;
+  }
+  50% {
+    width: 100%;
+    opacity: 1;
+  }
+  60% {
+    opacity: 0;
+  }
+}
+
+/* Data display with glow */
+.data-value {
+  font-family: 'Orbitron', monospace;
+  text-shadow:
+    0 0 10px currentColor,
+    0 0 20px currentColor,
+    0 0 30px currentColor;
+  animation: data-flicker 0.15s infinite alternate;
+}
+
+@keyframes data-flicker {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.98;
+  }
+}

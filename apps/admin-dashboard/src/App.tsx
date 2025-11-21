@@ -2,6 +2,7 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { DashboardLayout } from './components/Layout/DashboardLayout';
 import { SystemOverview } from './pages/SystemOverview';
+import { SystemOverviewAlt } from './pages/SystemOverviewAlt';
 import { Controllers } from './pages/Controllers';
 import { Devices } from './pages/Devices';
 import { Rooms } from './pages/Rooms';
@@ -27,7 +28,8 @@ function App() {
         <Routes>
           <Route path="/" element={<DashboardLayout />}>
             <Route index element={<Navigate to="/overview" replace />} />
-            <Route path="overview" element={<SystemOverview />} />
+            <Route path="overview" element={<SystemOverviewAlt />} />
+            <Route path="overview-classic" element={<SystemOverview />} />
             <Route path="gm-console" element={<GMConsole />} />
             <Route path="power-control" element={<PowerControl />} />
             <Route path="controllers" element={<Controllers />} />

@@ -5,17 +5,18 @@ import './DashboardLayout.css';
 
 export function DashboardLayout() {
   return (
-    <div className="dashboard-layout">
+    <div className="dashboard-layout circuit-bg">
       <div className="neural-grid" />
+      <div className="scan-line" />
 
       {/* Sidebar Navigation */}
-      <aside className="sidebar">
+      <aside className="sidebar glow-border corner-brackets">
         <div className="sidebar-header">
           <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '1rem' }}>
             {/* Sentient Eye Logo - Mini version with animation */}
-            <MiniSentientEye size={100} />
+            <MiniSentientEye size={120} />
           </div>
-          <h1 className="logo-text">SENTIENT</h1>
+          <h1 className="logo-text text-glow">SENTIENT</h1>
           <p className="logo-subtitle">Neural Engine</p>
         </div>
 

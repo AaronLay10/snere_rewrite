@@ -112,16 +112,14 @@ services:
       - .env
     environment:
       NODE_ENV: production
-      MQTT_URL: mqtt://mqtt:1883
-      API_URL: http://api-service:3000
+      MQTT_URL: mqtt://192.168.2.3:1883  # Production MQTT broker for dev testing
+      API_URL: http://localhost:3001  # API service exposed on host
+      REDIS_URL: redis://localhost:6379  # Redis exposed on host
       INTERNAL_REG_TOKEN: ${INTERNAL_REG_TOKEN}
     depends_on:
-      mqtt:
-        condition: service_started
       api-service:
         condition: service_healthy
-    networks:
-      - sentient_net
+    network_mode: "host"  # Use host network to access both production MQTT and local services
 
   realtime-gateway:
     build:

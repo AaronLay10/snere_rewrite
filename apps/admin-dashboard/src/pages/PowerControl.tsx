@@ -2,6 +2,8 @@ import { useState, useEffect } from 'react';
 import { useWebSocket } from '../hooks/useWebSocket';
 import { Power, Zap, ZapOff } from 'lucide-react';
 
+const API_URL = import.meta.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
+
 interface PowerController {
   controller_id: string;
   name: string;
@@ -17,36 +19,76 @@ interface PowerDevice {
   relayNumber?: number;
 }
 
+interface ApiDevice {
+  id: string;
+  controllerId: string;
+  friendly_name: string;
+  device_type: string;
+  device_category: string;
+  properties?: any;
+  created_at: string;
+  actions?: any[];
+}
+
 export function PowerControl() {
   const [powerControllers, setPowerControllers] = useState<Map<string, PowerController>>(new Map());
+  const [loading, setLoading] = useState(true);
   const { connected, events } = useWebSocket('ws://localhost:3002');
 
-  // Initialize with the three known power controllers
+  // Fetch devices from API on mount
   useEffect(() => {
-    const initialControllers = new Map<string, PowerController>();
+    const fetchDevices = async () => {
+      const controllerIds = [
+        'power_control_upper_right',
+        'power_control_lower_right',
+        'power_control_lower_left'
+      ];
 
-    initialControllers.set('power_control_upper_right', {
-      controller_id: 'power_control_upper_right',
-      name: 'Upper Right Power Control',
-      online: false,
-      devices: [],
-    });
+      const initialControllers = new Map<string, PowerController>();
 
-    initialControllers.set('power_control_lower_right', {
-      controller_id: 'power_control_lower_right',
-      name: 'Lower Right Power Control',
-      online: false,
-      devices: [],
-    });
+      for (const controllerId of controllerIds) {
+        try {
+          const response = await fetch(`${API_URL}/internal/devices/controller/${controllerId}`);
 
-    initialControllers.set('power_control_lower_left', {
-      controller_id: 'power_control_lower_left',
-      name: 'Lower Left Power Control',
-      online: false,
-      devices: [],
-    });
+          if (response.ok) {
+            const apiDevices: ApiDevice[] = await response.json();
 
-    setPowerControllers(initialControllers);
+            initialControllers.set(controllerId, {
+              controller_id: controllerId,
+              name: controllerId.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase()),
+              online: false,
+              devices: apiDevices.map(d => ({
+                device_id: d.id,
+                name: d.friendly_name,
+                state: false, // Default state, will be updated by WebSocket
+              })),
+            });
+          } else {
+            // Controller exists but has no devices yet
+            initialControllers.set(controllerId, {
+              controller_id: controllerId,
+              name: controllerId.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase()),
+              online: false,
+              devices: [],
+            });
+          }
+        } catch (error) {
+          console.error(`Failed to fetch devices for ${controllerId}:`, error);
+          // Initialize with empty controller on error
+          initialControllers.set(controllerId, {
+            controller_id: controllerId,
+            name: controllerId.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase()),
+            online: false,
+            devices: [],
+          });
+        }
+      }
+
+      setPowerControllers(initialControllers);
+      setLoading(false);
+    };
+
+    fetchDevices();
   }, []);
 
   // Listen for WebSocket events
@@ -101,16 +143,10 @@ export function PowerControl() {
             const deviceState = latestEvent.payload?.new_state?.on ?? latestEvent.payload?.new_state?.state ?? false;
 
             if (deviceIndex >= 0) {
-              // Update existing device
+              // Only update existing device state (devices come from database via API)
               controller.devices[deviceIndex].state = deviceState;
-            } else {
-              // Add new device
-              controller.devices.push({
-                device_id: deviceId,
-                name: deviceId.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase()),
-                state: deviceState,
-              });
             }
+            // Note: We don't add new devices here - devices must be registered in database first
           }
           return updated;
         });
@@ -137,31 +173,37 @@ export function PowerControl() {
   };
 
   return (
-    <div className="page-container">
-      <div className="page-header">
-        <div className="page-title-group">
-          <Power size={32} className="page-icon" />
-          <div>
-            <h1 className="page-title">Power Control</h1>
-            <p className="page-subtitle">Master power control for all room controllers</p>
+    <>
+      <div className="page-container">
+        <div className="page-header">
+          <div className="page-title-group">
+            <Power size={32} className="page-icon" />
+            <div>
+              <h1 className="page-title">Power Control</h1>
+              <p className="page-subtitle">Master power control for all room controllers</p>
+            </div>
+          </div>
+
+          <div className="status-badge" style={{
+            backgroundColor: connected ? 'rgba(16, 185, 129, 0.1)' : 'rgba(239, 68, 68, 0.1)',
+            color: connected ? '#10b981' : '#ef4444',
+            border: `1px solid ${connected ? '#10b981' : '#ef4444'}`,
+            padding: '0.5rem 1rem',
+            borderRadius: '0.5rem',
+            fontSize: '0.875rem',
+            fontWeight: '500',
+          }}>
+            {connected ? '● Connected' : '○ Disconnected'}
           </div>
         </div>
 
-        <div className="status-badge" style={{
-          backgroundColor: connected ? 'rgba(16, 185, 129, 0.1)' : 'rgba(239, 68, 68, 0.1)',
-          color: connected ? '#10b981' : '#ef4444',
-          border: `1px solid ${connected ? '#10b981' : '#ef4444'}`,
-          padding: '0.5rem 1rem',
-          borderRadius: '0.5rem',
-          fontSize: '0.875rem',
-          fontWeight: '500',
-        }}>
-          {connected ? '● Connected' : '○ Disconnected'}
+        {loading ? (
+        <div style={{ textAlign: 'center', padding: '3rem', color: '#9ca3af' }}>
+          <p>Loading devices from database...</p>
         </div>
-      </div>
-
-      <div className="power-control-grid">
-        {Array.from(powerControllers.values()).map(controller => (
+      ) : (
+        <div className="power-control-grid">
+          {Array.from(powerControllers.values()).map(controller => (
           <div key={controller.controller_id} className="power-controller-card">
             <div className="controller-header">
               <div className="controller-info">
@@ -220,7 +262,8 @@ export function PowerControl() {
             )}
           </div>
         ))}
-      </div>
+        </div>
+      )}
 
       <style>{`
         .power-control-grid {
@@ -375,7 +418,8 @@ export function PowerControl() {
           transform: translateY(-1px);
           box-shadow: 0 4px 12px rgba(107, 114, 128, 0.3);
         }
-      `}</style>
-    </div>
+        `}</style>
+      </div>
+    </>
   );
 }

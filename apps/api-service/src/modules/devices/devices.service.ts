@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { RegisterDeviceDto } from './dto/register-device.dto';
 import { PrismaService } from '../../prisma/prisma.service';
 import { Prisma } from '@prisma/client';
@@ -69,5 +69,33 @@ export class DevicesService {
     }
 
     return { device_id: device.id, controller_id: controller.id, status: 'registered' };
+  }
+
+  async listByController(controllerId: string) {
+    const devices = await this.prisma.device.findMany({
+      where: { controllerId },
+      include: {
+        actions: true
+      },
+      orderBy: { created_at: 'asc' }
+    });
+
+    return devices;
+  }
+
+  async getById(deviceId: string) {
+    const device = await this.prisma.device.findUnique({
+      where: { id: deviceId },
+      include: {
+        actions: true,
+        controller: true
+      }
+    });
+
+    if (!device) {
+      throw new NotFoundException(`Device ${deviceId} not found`);
+    }
+
+    return device;
   }
 }
