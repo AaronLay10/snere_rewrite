@@ -1,5 +1,5 @@
 import { Outlet, NavLink } from 'react-router-dom';
-import { Eye, Cpu, Boxes, Building2, Users, Layout, Activity } from 'lucide-react';
+import { Eye, Cpu, Boxes, Building2, Users, Layout, Activity, Power } from 'lucide-react';
 import { MiniSentientEye } from '../SentientEye/MiniSentientEye';
 import './DashboardLayout.css';
 
@@ -28,6 +28,11 @@ export function DashboardLayout() {
           <NavLink to="/gm-console" className={({ isActive }) => isActive ? 'nav-link active' : 'nav-link'}>
             <Activity size={20} />
             <span>GM Console</span>
+          </NavLink>
+
+          <NavLink to="/power-control" className={({ isActive }) => isActive ? 'nav-link active' : 'nav-link'}>
+            <Power size={20} />
+            <span>Power Control</span>
           </NavLink>
 
           <div className="nav-divider" />
